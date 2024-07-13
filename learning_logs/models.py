@@ -7,6 +7,7 @@ class Topic(models.Model):
     text = models.CharField(max_length=200)
     date_added = models.DateTimeField(auto_now_add=True)
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
+    topic_aim = models.CharField(max_length=200, default='')   # 增加 topic_aim 字段, 默认为空
 
     def __str__(self):
         """Return a string representation of the model."""

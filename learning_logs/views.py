@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
-
+from django.shortcuts import get_object_or_404
 from .models import Topic, Entry
 from .forms import TopicForm, EntryForm
 
@@ -14,7 +14,9 @@ def index(request):
 def topics(request):
     """Show all topics."""
     topics = Topic.objects.filter(owner=request.user).order_by('date_added')
+    entries = Entry.objects.filter(topic__owner=request.user).order_by('-date_added')
     context = {'topics': topics}
+    context['entries'] = entries
     return render(request, 'learning_logs/topics.html', context)
 
 @login_required
@@ -106,3 +108,30 @@ def delete_topic(request, topic_id):
         raise Http404
     topic.delete()
     return redirect('learning_logs:topics')
+def new_topic(request):
+    """Add a new topic."""
+    if request.method != 'POST':
+        # No data submitted; create a blank form.
+        form = TopicForm()
+    else:
+        # POST data submitted; process data.
+        form = TopicForm(data=request.POST)
+        if form.is_valid():
+            new_topic = form.save(commit=False)
+            new_topic.owner = request.user
+            new_topic.save()
+            return redirect('learning_logs:topics')
+
+    # Display a blank or invalid form.
+    context = {'form': form}
+    return render(request, 'learning_logs/new_topic.html', context)
+@login_required
+def edit_goal(request, topic_id):
+    """Edit the goal for a topic."""
+    topic = get_object_or_404(Topic, id=topic_id, owner=request.user)
+    if request.method == 'POST':
+        topic_aim = request.POST.get('topic_aim')
+        if topic_aim:
+            topic.topic_aim = topic_aim
+            topic.save()
+        return redirect('learning_logs:topic', topic_id=topic.id)

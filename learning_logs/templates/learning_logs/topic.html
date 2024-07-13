@@ -1,15 +1,30 @@
 {% extends 'learning_logs/base.html' %}
 
 {% block page_header %}
-  <h1>{{ topic.text }}</h1>
-  {% comment %} 改成按钮形式，并添加onclick事件 {% endcomment %}
- <a href="{%url 'learning_logs:topics'%}" class="btn btn-outline-secondary">Back to topics</a>
-  <a href="{% url 'learning_logs:new_entry' topic.id %}" class="btn btn-outline-secondary">Add new entry</a>
-  <a href="{% url 'learning_logs:delete_topic' topic.id %}" class="btn btn-outline-secondary" onclick="return confirmDelete('topic');">Delete topic</a>
-  {% endblock page_header %}
+  <div class="d-flex justify-content-between align-items-center">
+    <h1>{{ topic.text }}</h1>
+    <div>
+      <a href="{% url 'learning_logs:topics' %}" class="btn btn-outline-secondary">Back to topics</a>
+      <a href="{% url 'learning_logs:new_entry' topic.id %}" class="btn btn-outline-secondary">Add new entry</a>
+      <a href="{% url 'learning_logs:delete_topic' topic.id %}" class="btn btn-outline-secondary" onclick="return confirmDelete('topic');">Delete topic</a>
+    </div>
+  </div>
+  <p id="goal-text"><strong>Goal:</strong> {{ topic.topic_aim }}</p> <!-- 显示目标文案 -->
+  <!-- 添加编辑目标的按钮 -->
+  <button type="button" id="editGoalButton" class="btn btn-outline-secondary" onclick="showEditGoalForm()">Edit Goal</button>
+  
+  <!-- 修改目标的表单，初始状态下隐藏 -->
+  <form id="editGoalForm" action="{% url 'learning_logs:edit_goal' topic.id %}" method="post" class="form-inline mt-3" style="display: none;" onsubmit="return confirmUpdateGoal()">
+    {% csrf_token %}
+    <div class="form-group mr-2">
+      <label for="topic_aim" class="mr-2">Edit Goal:</label>
+      <input type="text" class="form-control" id="topic_aim" name="topic_aim" value="{{ topic.topic_aim }}">
+    </div>
+    <button type="submit" class="btn btn-primary">Update Goal</button>
+  </form>
+{% endblock page_header %}
 
 {% block content %}
-
   {% for entry in entries %}
     <div class="card mb-3">
       <!-- Card header with timestamp and edit link -->
@@ -29,6 +44,15 @@
     function confirmDelete(itemType) {
         return confirm(`Are you sure you want to delete this ${itemType}?`);
     }
-  </script>
 
+    function showEditGoalForm() {
+        document.getElementById('editGoalForm').style.display = 'block';
+        document.getElementById('editGoalButton').style.display = 'none';
+        document.getElementById('goal-text').style.display = 'none';
+    }
+
+    function confirmUpdateGoal() {
+        return confirm('Are you sure you want to update the goal?');
+    }
+  </script>
 {% endblock content %}

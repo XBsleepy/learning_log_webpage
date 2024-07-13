@@ -1,22 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Topics</title>
+    <style>
+        .custom-link {
+            color: red;
+            text-decoration: none; /* 移除下划线 */
+        }
+        .custom-link:hover {
+            color: darkred; /* 可选：设置悬停时的颜色 */
+        }
+    </style>
+</head>
+<body>
 {% extends 'learning_logs/base.html' %}
 
 {% block page_header %}
-  <h1>Topics</h1>
-  <a href="{% url 'learning_logs:new_topic' %}" class="btn btn-outline-secondary">Add a new topic</a>
+  <div class="d-flex justify-content-between align-items-center">
+    <div class="d-flex align-items-center">
+      <h1 class="mr-4">Topics</h1>
+      <a href="{% url 'learning_logs:new_topic' %}" class="btn btn-outline-secondary">Add a new topic</a>
+    </div>
+    <ul class="list-group list-group-horizontal">
+      {% for topic in topics %}
+        <li class="list-group-item border-0">
+          <a href="{% url 'learning_logs:topic' topic.id %}" class="custom-link">
+            {{ topic.text }}</a>
+        </li>
+      {% empty %}
+        <li class="list-group-item border-0">No topics have been added yet.</li>
+      {% endfor %}
+    </ul>
+  </div>
 {% endblock page_header %}
 
 {% block content %}
-
-  <ul class="list-group border-bottom pb-2 mb-4">
-    {% for topic in topics %}
-      <li class="list-group-item border-0">
-        <a href="{% url 'learning_logs:topic' topic.id %}">
-          {{ topic.text }}</a>
-      </li>
-    {% empty %}
-      <li class="list-group-item border-0">No topics have been added yet.</li>
-    {% endfor %}
-  </ul>
-
- 
+<div class="row">
+  <div class="col-md-12"> <!-- 整个页面内容 -->
+    <div style="overflow-y: scroll; height: 400px;"> <!-- 设置滚动窗口的高度和样式 -->
+      <ul class="list-group">
+        {% for entry in entries %}
+          <li class="list-group-item">
+            <!-- 使用 Bootstrap 的边框样式和文本对齐类 -->
+            <div class="d-flex justify-content-between align-items-center">
+              <div class="border p-2 rounded">
+                <span style="color:red">
+                  <a href="{% url 'learning_logs:topic' entry.topic.id %}" class="custom-link">
+                    {{ entry.topic.text }}</a>
+                </span>
+              </div>
+              <div class="text-right">
+                <h5>{{ entry.date_added }}</h5>
+              </div>
+            </div>
+            <p>{{ entry.text }}</p>
+          </li>
+        {% empty %}
+          <li class="list-group-item">No entries found.</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
 {% endblock content %}
+</body>
+</html>
