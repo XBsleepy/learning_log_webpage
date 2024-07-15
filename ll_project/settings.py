@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'learning_logs',
     'accounts',
     "dairy",
+    "todolist",
     # Third party apps.
     'django_bootstrap5',
 

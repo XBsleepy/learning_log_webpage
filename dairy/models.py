@@ -4,7 +4,7 @@ from django.utils import timezone
 
 class DairyItem(models.Model):
     """日记项"""
-    topic = models.CharField(max_length=20, default='无题')
+    topic = models.CharField(max_length=40, default='无题')
     text = models.TextField()
     date_added = models.DateTimeField(default=timezone.now, null=True, blank=True)
     today_score = models.IntegerField(default=60, blank=True)

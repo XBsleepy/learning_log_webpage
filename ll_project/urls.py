@@ -24,4 +24,5 @@ urlpatterns = [
     path('', home, name='home'),  #
     path('', include('learning_logs.urls')),
     path('dairy/', include('dairy.urls')),
+    path('todolist/', include('todolist.urls')),
 ]

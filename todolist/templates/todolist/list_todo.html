@@ -1,0 +1,111 @@
+{% extends 'base.html' %} 
+{% block page_header %}         <div class="d-flex justify-content-between align-items-center">           <div class="d-flex align-items-center">             <h1 class="mr-4">Todo List</h1>           </div> <div>             <a href="{% url 'todolist:add_todo' %}" class="btn btn-primary btn-lg">Add a new todo</a>           </div>         </div>       {% endblock %} 
+{% block content %}
+  <!DOCTYPE html> <html>
+    <head>
+      <title>Todo List</title> <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" /> <style>
+                                                                                                                                           .todo-section {
+                                                                                                                                             margin-bottom: 20px;
+                                                                                                                                           }
+                                                                                                                                           .red {
+                                                                                                                                             color: red;
+                                                                                                                                           }
+                                                                                                                                           .list-group-item {
+                                                                                                                                             display: flex;
+                                                                                                                                             justify-content: space-between;
+                                                                                                                                             align-items: center;
+                                                                                                                                           }
+                                                                                                                                           .remaining-time {
+                                                                                                                                             flex-grow: 1;
+                                                                                                                                             margin-left: 10px;
+                                                                                                                                           }
+                                                                                                                                         </style> <script>         function toggleComplete(taskId) {             fetch(`/toggle_complete/${taskId}/`, {                 method: 'POST',                 headers: {                     'X-CSRFToken': '{{ csrf_token }}',                     'Content-Type': 'application/json'                 },                 body: JSON.stringify({})             })             .then((response) => response.json())             .then((data) => {                 const button = document.getElementById(`complete-button-${taskId}`)                 button.textContent = data.complete ? '已秒' : '秒了'                 button.classList.toggle('btn-success', data.complete)                 button.classList.toggle('btn-primary', !data.complete)             })         }          function localizeTimes() {             document.querySelectorAll('.due-date').forEach((element) => {                 const utcTime = element.getAttribute('data-utc-time')                 const localTime = new Date(utcTime).toLocaleString()                 element.textContent = localTime             })         }          document.addEventListener('DOMContentLoaded', localizeTimes)     </script>
+    </head> <body>
+<div class="container">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="todo-section">
+              <h2>Important & Emergency</h2> <ul class="list-group">
+                {% for item in important_emergency %}
+                  <li class="list-group-item">
+                    <strong>{{ item.title }}</strong>
+                    <span class="remaining-time">
+                      {% if now < item.due_date %}
+                        别急：<span>{{ now|timesince:item.due_date }}</span>
+                      {% else %}
+                        <span class="red">急了！{{ item.due_date|timesince:now }}</span>
+                      {% endif %} <span class="due-date" data-utc-time="{{ item.due_date|date:'c' }}"></span>
+                    </span>
+                    <button id="complete-button-{{ item.id }}" class="btn btn-sm {{ item.complete|yesno:'btn-success,btn-primary' }}" onclick="toggleComplete({{ item.id }})">{{ item.complete|yesno:'真秒了,秒了' }}</button>
+                  </li>
+                {% empty %}
+                  <li class="list-group-item">全秒了哥</li>
+                {% endfor %}
+              </ul>
+            </div>
+          </div> <div class="col-md-6">
+            <div class="todo-section">
+              <h2>Important & Not Emergency</h2> <ul class="list-group">
+                {% for item in important_non_emergency %}
+                  <li class="list-group-item">
+                    <strong>{{ item.title }}</strong>
+                    <span class="remaining-time">
+                      {% if now < item.due_date %}
+                        别急：<span>{{ now|timesince:item.due_date }}</span>
+                      {% else %}
+                        <span class="red">急了！{{ item.due_date|timesince:now }}</span>
+                      {% endif %} <span class="due-date" data-utc-time="{{ item.due_date|date:'c' }}"></span>
+                    </span>
+                    <button id="complete-button-{{ item.id }}" class="btn btn-sm {{ item.complete|yesno:'btn-success,btn-primary' }}" onclick="toggleComplete({{ item.id }})">{{ item.complete|yesno:'真秒了,秒了' }}</button>
+                  </li>
+                {% empty %}
+                  <li class="list-group-item">全秒了哥</li>
+                {% endfor %}
+              </ul>
+            </div>
+          </div> <div class="col-md-6">
+            <div class="todo-section">
+              <h2>Not Important & Emergency</h2> <ul class="list-group">
+                {% for item in non_important_emergency %}
+                  <li class="list-group-item">
+                    <strong>{{ item.title }}</strong>
+                    <span class="remaining-time">
+                      别急：{% if now < item.due_date %}
+                        <span class="red">{{ item.due_date|timesince:now }}</span>
+                      {% else %}
+                        <span>{{ item.due_date|timesince:now }}</span>
+                      {% endif %} <span class="due-date" data-utc-time="{{ item.due_date|date:'c' }}"></span>
+                    </span>
+                    <button id="complete-button-{{ item.id }}" class="btn btn-sm {{ item.complete|yesno:'btn-success,btn-primary' }}" onclick="toggleComplete({{ item.id }})">{{ item.complete|yesno:'已秒,秒了' }}</button>
+                  </li>
+                {% empty %}
+                  <li class="list-group-item">全秒了哥</li>
+                {% endfor %}
+              </ul>
+            </div>
+          </div> <div class="col-md-6">
+            <div class="todo-section">
+              <h2>Not Important & Not Emergency</h2> <ul class="list-group">
+                {% for item in non_important_non_emergency %}
+                  <li class="list-group-item">
+                    <strong>{{ item.title }}</strong>
+                    <span class="remaining-time">
+                      {% if now < item.due_date %}
+                        别急：<span>{{ now|timesince:item.due_date }}</span>
+                      {% else %}
+                        <span class="red">急了！{{ item.due_date|timesince:now }}</span>
+                      {% endif %} <span class="due-date" data-utc-time="{{ item.due_date|date:'c' }}"></span>
+                    </span>
+                    <button id="complete-button-{{ item.id }}" class="btn btn-sm {{ item.complete|yesno:'btn-success,btn-primary' }}" onclick="toggleComplete({{ item.id }})">{{ item.complete|yesno:'真秒了,秒了' }}</button>
+                  </li>
+                {% empty %}
+                  <li class="list-group-item">全秒了哥</li>
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </body>
+  </html>
+{% endblock %}
