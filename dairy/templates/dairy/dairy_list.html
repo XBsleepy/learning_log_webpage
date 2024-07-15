@@ -15,11 +15,11 @@
 <div class="dairy-list">
     {% for item in dairy_items %}
     <div class="dairy-item border-bottom mb-4 pb-2">
-        <p><strong>{{ item.date_added|date:"Y-m-d H:i" }}</strong></p>
+        <p><strong>{{ item.date_added|date:"Y-m-d" }}</strong></p>
+        <p><strong>{{ item.topic }}</strong></p>
         <p>{{ item.text }}</p>
-        <p><em>Mood: {{ item.get_mood_display }}</em></p>
         <p><em>Today's Score: {{ item.today_score }}</em></p>
-        <p><em>Owner: {{ item.owner.username }}</em></p>
+        <a href="{% url 'dairy:delete_dairy' item.id %}" class="btn btn-danger delete-button" onclick="return confirm('你来真的？');">Delete</a>
     </div>
     {% empty %}
     <p>No dairy items have been added yet.</p>

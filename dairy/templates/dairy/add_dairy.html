@@ -1,1 +1,61 @@
-{%extends "base.html"%}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Dairy Item</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <style>
+    </style>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Add Dairy Item</h1>
+        <form id="dairyForm" method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="topic">Add Topic</label>
+                <input type="text" id="topic" name="topic" class="form-control" placeholder="随便吧">
+            </div>
+            <div class="form-group">
+                <label for="date_added">Date Added</label>
+                <input type="datetime-local" id="date_added" name="date_added" class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="text">想说的话，说不出来</label>
+                <textarea id="text" name="text" cols="80" rows="10" class="form-control" placeholder="有什么好说的呢？"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="today_score">Today Score</label>
+                <input type="range" id="today_score" name="today_score" min="0" max="100" value="60" class="form-control-range">
+                <span id="score_display">60</span>
+            </div>
+            <button type="submit" class="btn btn-primary">Add Dairy Item</button>
+        </form>
+    </div>
+    <script>
+        $(document).ready(function(){
+            // Set current date and time as default for date_added field considering the timezone offset
+            var now = new Date();
+            var offset = now.getTimezoneOffset() * 60000; // Offset in milliseconds
+            var localISOTime = new Date(now - offset).toISOString().slice(0, 16);
+            $('#date_added').val(localISOTime);
+
+            // Today score slider handler
+            $('#today_score').on('input', function(){
+                $('#score_display').text($(this).val());
+            });
+
+            // Set default values if fields are empty on form submission
+            $('#dairyForm').on('submit', function(event) {
+                if ($('#topic').val().trim() === '') {
+                    $('#topic').val('随便吧');
+                }
+                if ($('#text').val().trim() === '') {
+                    $('#text').val('想说的话，说不出来');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
